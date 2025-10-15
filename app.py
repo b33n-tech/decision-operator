@@ -1,137 +1,114 @@
 import re
-from typing import List, Dict, Set
+from typing import Dict, List
 
-class AnalyseurImplicites:
+class GenerateurCadrage:
     def __init__(self):
-        self.mots_ambigu = {
-            'coordination': ['sans_autorite', 'responsabilite_cachee'],
-            'collaboration': ['dependance_cachee', 'effort_asymetrique'],
-            'opportunité': ['charge_cachee', 'urgence_artificielle'],
-            'flexibilité': ['contournement_procedure', 'precedent_dangereux'],
-            'confiance': ['decharge_responsabilite', 'attente_implicite']
+        # Les catégories de cadrage fondamentales
+        self.sections = {
+            "Contexte": [
+                "Quel est le contexte réel du projet ?",
+                "Qui a initié la demande ?",
+                "Quel problème cela est-il censé résoudre ?"
+            ],
+            "Objectifs": [
+                "Quels sont les objectifs explicites ?",
+                "Quels sont les objectifs implicites (non dits mais attendus) ?",
+                "Y a-t-il un objectif prioritaire ?"
+            ],
+            "Moyens et contraintes": [
+                "Quel est le budget disponible (ou à confirmer) ?",
+                "Quel est le délai ?",
+                "Quelles ressources humaines sont impliquées ?",
+                "Y a-t-il des contraintes techniques, légales ou politiques connues ?"
+            ],
+            "Parties prenantes": [
+                "Qui sont les acteurs directement impliqués ?",
+                "Qui sont les acteurs indirectement impactés ?",
+                "Qui décide réellement (autorité finale) ?",
+                "Qui exécute (responsable opérationnel) ?"
+            ],
+            "Livrables et critères de succès": [
+                "Quels sont les livrables attendus ?",
+                "Quels critères permettront de dire que le projet est réussi ?",
+                "Quels risques majeurs peuvent bloquer le succès ?"
+            ]
         }
-        
-        self.mots_danger = {
-            'simple': ['complexite_cachee'],
-            'rapide': ['qualite_sacrifiee'],
-            'temporaire': ['perennisation_cachee'],
-            'standard': ['adaptation_necessaire'],
-            'normal': ['procedure_contournee']
-        }
-        
-        self.verbes_transfert = ['coordonner', 'faciliter', 'superviser', 'animer', 'relayer']
-        
-    def analyser_instruction(self, texte: str) -> Dict:
-        texte_lower = texte.lower()
-        
-        resultats = {
-            'implicites_detectes': [],
-            'dependances_cachees': self._detecter_dependances(texte_lower),
-            'transferts_responsabilite': self._detecter_transferts(texte_lower),
-            'scenarios_risque': self._generer_scenarios_risque(texte_lower),
-            'checklist_actions': self._generer_checklist(texte_lower),
-            'questions_clarification': self._generer_questions(texte_lower)
-        }
-        
-        # Détection des patterns d'ambiguïté
-        resultats['implicites_detectes'].extend(self._scanner_mots_ambigu(texte_lower))
-        resultats['implicites_detectes'].extend(self._scanner_mots_danger(texte_lower))
-        
-        return resultats
-    
-    def _detecter_dependances(self, texte: str) -> List[str]:
-        dependances = []
-        patterns = [
-            (r'sous réserve de (.+?)', 'Dépendance conditionnelle détectée'),
-            (r'en coordination avec (.+?)', 'Dépendance humaine externe'),
-            (r'sur la base de (.+?)', 'Dépendance documentaire'),
-            (r'après (.+?)', 'Séquence imposée'),
-            (r'une fois que (.+?)', 'Prérequis caché')
-        ]
-        
-        for pattern, message in patterns:
-            matches = re.finditer(pattern, texte)
-            for match in matches:
-                dependances.append(f"{message} : '{match.group(1)}'")
-        
-        return dependances
-    
-    def _detecter_transferts(self, texte: str) -> List[str]:
-        transferts = []
-        
-        for verbe in self.verbes_transfert:
-            if verbe in texte:
-                pattern = rf'{verbe}\s+(.+?)(?=\.|,|$)'
-                matches = re.finditer(pattern, texte)
-                for match in matches:
-                    transferts.append(f"Transfert de charge : '{match.group(0)}' → Responsabilité sans autorité")
-        
-        return transferts
-    
-    def _scanner_mots_ambigu(self, texte: str) -> List[str]:
-        implicites = []
-        for mot, risques in self.mots_ambigu.items():
-            if mot in texte:
-                implicites.extend(risques)
-        return list(set(implicites))
-    
-    def _scanner_mots_danger(self, texte: str) -> List[str]:
-        dangers = []
-        for mot, risques in self.mots_danger.items():
-            if mot in texte:
-                dangers.extend(risques)
-        return list(set(dangers))
-    
-    def _generer_scenarios_risque(self, texte: str) -> List[str]:
-        scenarios = ["SCÉNARIO RÉALISTE : Retards, non-réponses, blocages silencieux"]
-        
-        if any(mot in texte for mot in ['urgent', 'rapide', 'délai']):
-            scenarios.append("SCÉNARIO URGENCE : Qualité sacrifiée, stress accru, erreurs probables")
-        
-        if any(mot in texte for mot in ['coordination', 'collaboration']):
-            scenarios.append("SCÉNARIO COORDINATION : Attente passive, délais indéfinis, responsabilité diluée")
-        
-        return scenarios
-    
-    def _generer_checklist(self, texte: str) -> List[str]:
-        checklist = [
-            "☐ Identifier QUI a réellement l'autorité",
-            "☐ Lister TOUTES les parties prenantes implicites", 
-            "☐ Documenter par écrit les attendus exacts",
-            "☐ Prévoir 30% de temps supplémentaire pour les blocages",
-            "☐ Anticiper le scénario du pire acteur"
-        ]
-        
-        if 'budget' in texte or 'coût' in texte:
-            checklist.append("☐ Obtenir validation écrite des engagements financiers")
-        
-        return checklist
-    
-    def _generer_questions(self, texte: str) -> List[str]:
-        questions = [
-            "Qui a l'autorité réelle de décision ?",
-            "Que se passe-t-il si une partie prenante ne répond pas ?",
-            "Quel est le budget ALLOUÉ (pas estimé) ?",
-            "Qui porte la responsabilité finale en cas d'échec ?"
-        ]
-        return questions
 
-# UTILISATION
+    def generer_template(self, phrase_projet: str) -> Dict:
+        """
+        Génère un template de cadrage dynamique à partir d'une phrase d'entrée floue.
+        """
+        # Essayer d'extraire automatiquement nom, action, et parties prenantes
+        nom_projet = self._extraire_nom_projet(phrase_projet)
+        action = self._extraire_action(phrase_projet)
+        acteurs = self._extraire_acteurs(phrase_projet)
+
+        # Générer le texte à trous
+        texte_cadrage = self._generer_texte_cadrage(nom_projet, action, acteurs)
+        json_cadrage = self._generer_json_structure(texte_cadrage)
+
+        return {"texte": texte_cadrage, "structure": json_cadrage}
+
+    def _extraire_nom_projet(self, texte: str) -> str:
+        match = re.search(r"projet\s+([A-Za-z0-9\- ]+)", texte, re.IGNORECASE)
+        return match.group(1).strip() if match else "Nom du projet à préciser"
+
+    def _extraire_action(self, texte: str) -> str:
+        match = re.search(r"faire\s+([A-Za-z0-9\- ]+)", texte, re.IGNORECASE)
+        return match.group(1).strip() if match else "Objectif à clarifier"
+
+    def _extraire_acteurs(self, texte: str) -> List[str]:
+        acteurs = re.findall(r"avec\s+([A-Za-z0-9\- ,]+)", texte, re.IGNORECASE)
+        if acteurs:
+            return [a.strip() for a in acteurs[0].split(",")]
+        return ["Parties prenantes à identifier"]
+
+    def _generer_texte_cadrage(self, nom_projet: str, action: str, acteurs: List[str]) -> str:
+        texte = f"""
+=== CADRAGE AUTOMATIQUE ===
+
+🧩 Projet : {nom_projet}
+🎯 Objectif déclaré : {action}
+👥 Parties mentionnées : {', '.join(acteurs)}
+
+--- CONTEXTE ---
+{self._texte_a_trous(self.sections['Contexte'])}
+
+--- OBJECTIFS ---
+{self._texte_a_trous(self.sections['Objectifs'])}
+
+--- MOYENS ET CONTRAINTES ---
+{self._texte_a_trous(self.sections['Moyens et contraintes'])}
+
+--- PARTIES PRENANTES ---
+{self._texte_a_trous(self.sections['Parties prenantes'])}
+
+--- LIVRABLES ET CRITÈRES DE SUCCÈS ---
+{self._texte_a_trous(self.sections['Livrables et critères de succès'])}
+
+🧠 Pense-bête :
+- Tout ce qui n’est pas clarifié maintenant deviendra un problème plus tard.
+- Si tu ne sais pas “qui décide”, c’est toi par défaut.
+"""
+        return texte.strip()
+
+    def _texte_a_trous(self, questions: List[str]) -> str:
+        return "\n".join([f"• {q} → [_________________________]" for q in questions])
+
+    def _generer_json_structure(self, texte: str) -> Dict:
+        # Structure JSON réutilisable ou exportable vers interface
+        structure = {}
+        for section, questions in self.sections.items():
+            structure[section] = [{"question": q, "réponse": ""} for q in questions]
+        return structure
+
+
+# --- UTILISATION ---
 if __name__ == "__main__":
-    analyseur = AnalyseurImplicites()
+    generateur = GenerateurCadrage()
     
-    instruction = """
-    Nous avons une opportunité de coordonner le projet Innovation 
-    en collaboration avec les équipes métier. C'est une action simple 
-    et rapide qui nécessite votre flexibilité. Sous réserve de 
-    l'accord de la direction, une fois que les équipes techniques 
-    auront donné leur feu vert.
-    """
+    phrase = "On m’a filé le projet Horizon où ils veulent faire un prototype rapide avec les équipes data et design. Je n’ai eu que ça comme info."
     
-    resultat = analyseur.analyser_instruction(instruction)
+    resultat = generateur.generer_template(phrase)
     
-    print("=== ANALYSE IMPITOYABLE ===")
-    for categorie, elements in resultat.items():
-        print(f"\n{categorie.upper()}:")
-        for element in elements:
-            print(f"  • {element}")
+    print(resultat["texte"])
