@@ -1,0 +1,6 @@
+{
+    "notes_existantes": "Tu as déjà pris des notes sur le projet. Ton rôle est de structurer ces notes en informations actionnables. Génére un texte à trous où chaque trou correspond à une information manquante clé (objectif, tâches, dépendances, zones grises).",
+    "info_mise_a_jour": "On te fournit une mise à jour ou un changement dans un projet. Identifie ce qui est nouveau, ce qui a changé, et met à jour les zones d'incertitude et les dépendances. Génère un texte à trous pour toutes les informations à vérifier.",
+    "pitch_spontane": "On te fournit un pitch spontané pour une tâche ou mission. Transforme-le en : Pitch standardisé, Objectif clair, Tâches identifiées, Dépendances cachées, Zones grises. Crée un texte à trous pour toutes les informations manquantes.",
+    "notes_melangees": "On te fournit un ensemble de notes accumulées sur différents sujets. Découpe-les par sujet, et pour chaque sujet, génère : Objectif, Tâches clés, Dépendances, Zones grises. Texte à trous prêt à compléter."
+}
